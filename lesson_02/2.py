@@ -1,7 +1,12 @@
-sum = 16
+# Задача 2: Найдите сумму цифр трехзначного числа.
 
-pet = sum / 8
-kat = pet * 4
-ser = pet
+num = 576
+sum_of_numbers = 0
+# num_len = 3
 
-print(pet, kat, ser)
+# while num_len > 0:
+#    sum += (num % 10)
+#    num //= 10
+#    num_len -= 1
+sum_of_numbers = (int(str(num[0])) + int(str(num[1])) + int(str[2]))
+print(sum_of_numbers)
