@@ -6,4 +6,12 @@
 # Input: 2 -> 3 4
 # Output: 4 3
 
+def reverse(number):
+    if number == 0:
+        return ''
+    k = int(input('Введите число: '))
+    return reverse(number - 1) + f'{k}'
 
+
+n = int(input('Введите количество цифр: '))
+print(reverse(n))
