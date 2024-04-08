@@ -1,6 +1,4 @@
-list_01 = [1, 2, 3, 5, 8, 15, 23, 38]
-print(list_01)
-list_01 = [i for i in list_01 if i % 2 == 0]
-print(list_01)
-list_01 = [(i, i * i) for i in list_01]
-print(list_01)
+users = ['user1', 'user2', 'user3'] 
+data = list(enumerate(users))
+print(data)  # [(0, 'user1'), (1, 'user2'), (2, 'user3))]
+print(data[1][0])
