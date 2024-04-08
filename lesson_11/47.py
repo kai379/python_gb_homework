@@ -12,6 +12,7 @@
 
 values = [1, 23, 42, 'asdfg']
 transformed_values = list(map(lambda x: x, values))
+# transformed_values = list(i for i in values)
 if values == transformed_values:
     print('ok')
 else:
