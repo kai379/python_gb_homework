@@ -14,5 +14,42 @@
 # Если фраза только одна, то ритм определить не получится и необходимо вывести:
 # Количество фраз должно быть больше одной!.
 
-stroka = 'пара-ра-рам рам-пам-папам па-ра-па-дам'
 
+def slogi(spisok):
+    count = 0
+    glasnie = ['а', 'у', 'о', 'и', 'э', 'ы', 'я', 'ю', 'е', 'ё']
+    for i in spisok:
+       for j in glasnie:
+            if i == j:
+                count += 1
+    return count
+
+
+stroka = 'Пух парахыя'
+list_01 = stroka.split()
+if len(list_01) > 1:
+    count = list(map(lambda x: slogi(x), list_01))
+    answer = 'Парам пам-пам'
+    for i in range(1, len(count)):
+        if count[i] != count[i - 1]:
+            answer = 'Пам парам'
+    print(answer)
+else:
+    print('Количество фраз должно быть больше одной!')
+
+
+# Решение GB
+# vowels = ['а', 'е', 'ё', 'и', 'й', 'о', 'у', 'ы', 'э', 'ю', 'я']
+# phrases = stroka.split()
+# if len(phrases) < 2:
+#  print('Количество фраз должно быть больше одной!')
+# else:
+#  countVowels = []
+#
+#  for i in phrases:
+#   countVowels.append(len([x for x in i if x.lower() in vowels]))
+#
+#  if countVowels.count(countVowels[0]) == len(countVowels):
+#   print('Парам пам-пам')
+#  else:
+#   print('Пам парам')
