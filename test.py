@@ -1,4 +1,13 @@
-users = ['user1', 'user2', 'user3'] 
-data = list(enumerate(users))
-print(data)  # [(0, 'user1'), (1, 'user2'), (2, 'user3))]
-print(data[1][0])
+import csv
+
+
+data = [     
+	['name', 'age', 'city'],     
+	['Alice', 25, 'New York'],     
+	['Bob', 30, 'Los Angeles'],     
+	['Charlie', 35, 'Chicago'] 
+]
+
+with open('output.csv', 'w', newline='') as file:     
+	writer = csv.writer(file)     
+	writer.writerows(data)
