@@ -19,16 +19,16 @@ def record_contact_in_first_f(contact: dict):
 
 def record_contact_in_second_f(contact: dict):
     with open('data_second_variant.csv', 'a', encoding='utf-8') as file:
-        file.write(f"{contact['name']};{contact['surname']};{contact['phone']};{contact['address']}\n")
+        file.write(f"{contact['name']};{contact['surname']};{contact['phone']};{contact['address']}\n\n")
 
 
 # Функция добавления контакта в один из файлов
 def create_data():
     contact = input_data()
-    var = input(f"\nВ каком формате записать данные?\n\n"
-                f"1 Вариант: \n"
+    var = input(f"\nВ какой файл записать данные?\n\n"
+                f"1. data_first_variant.csv: \n"
                 f"{contact['name']}\n{contact['surname']}\n{contact['phone']}\n{contact['address']}\n\n"
-                f"2 Вариант: \n"
+                f"2 data_second_variant.csv: \n"
                 f"{contact['name']};{contact['surname']};{contact['phone']};{contact['address']}\n"
                 f"Выберите номер варианта: ")
 
@@ -37,12 +37,8 @@ def create_data():
         var = input("Введите номер варианта: ")
 
     if var == '1':
-        # with open('data_first_variant.csv', 'a', encoding='utf-8') as file:
-        #     file.write(f"{contact['name']}\n{contact['surname']}\n{contact['phone']}\n{contact['address']}\n\n")
         record_contact_in_first_f(contact)
     elif var == '2':
-        # with open('data_second_variant.csv', 'a', encoding='utf-8') as file:
-        #     file.write(f"{contact['name']};{contact['surname']};{contact['phone']};{contact['address']}\n")
         record_contact_in_second_f(contact)
 
 
@@ -68,17 +64,13 @@ def print_data():
         with open('data_first_variant.csv', 'r', encoding='utf-8') as file:
             data_first = file.readlines()
             data_first_lists = []
-            print(data_first)
             j = 0
             for i in range(len(data_first)):
                 if data_first[i] == '\n' or i == len(data_first) - 1:
                     data_first_lists.append(''.join(data_first[j:i + 1]))
                     j = i + 1
-                    print(data_first_lists)
-            print(data_first_lists)
             print(''.join(data_first_lists))
     elif var == '2':
-        print('Вывожу данные из 2 файла: \n')
         with open('data_second_variant.csv', 'r', encoding='utf-8') as file:
             data_second = file.readlines()
             print(*data_second)
@@ -95,34 +87,64 @@ def change_data():
 def search_data():
     file_var = select_file_for_work('По какому файлу осуществить поиск?')
 
-    # print(
-    #     "По каким данным осуществлять поиск\n"
-    #     "1 - По имени\n"
-    #     "2 - По фамилии\n"
-    #     "3 - По номеру телефона\n"
-    #     "4 - По адресу"
-    # )
-    #
-    # search_var = input('Введите номер пункта меню:')
-    # while search_var not in ('1', '2', '3', '4'):
-    #     print('Неправильный ввод!!!')
-    #     search_var = input('Введите номер пункта меню:')
+    print(
+        "По каким данным осуществлять поиск?\n"
+        "1 - По имени\n"
+        "2 - По фамилии\n"
+        "3 - По номеру телефона\n"
+        "4 - По адресу"
+    )
 
-    data_for_search = input('Введите Имя, Фамилию, номер телефона или адрес для поиска: ')
+    search_var = input('Введите номер пункта меню:')
+    while search_var not in ('1', '2', '3', '4'):
+        print('Неправильный ввод!!!')
+        search_var = input('Введите номер пункта меню:')
+
+    # Число поправки индекса при поиске по:
+    search_index = 0
+    text_for_input = ''
+    match search_var:
+        case '1':
+            search_index = 4  # Имени
+            text_for_input = 'Имя'
+        case '2':
+            search_index = 3  # Фамилии
+            text_for_input = 'Фамилию'
+        case '3':
+            search_index = 2  # Номеру телефона
+            text_for_input = 'номер телефона'
+        case '4':
+            search_index = 1  # Адресу
+            text_for_input = 'адрес'
+
+    data_for_search = input(f'Введите {text_for_input} для поиска: ')
 
     if file_var == '1':  # Поиск по data_first_variant
         with open('data_first_variant.csv', 'r', encoding='utf-8') as file:
             data_first = file.readlines()
-            data_first_lists = []
+            print(data_first)
+            search_results = []
             j = 0
             for i in range(len(data_first)):
                 if data_first[i] == '\n' or i == len(data_first) - 1:
-                    data_first_lists.append(''.join(data_first[j:i + 1]))
+                    if data_for_search in data_first[i - search_index]:
+                        search_results.append(''.join(data_first[j:i + 1]))
                     j = i + 1
-            search_results = []
-            for i in range(len(data_first_lists)):
-                if data_for_search in data_first_lists[i]:
-                    search_results.append(data_first_lists[i])
-            print(*search_results)
+            print(''.join(search_results))
     elif file_var == '2':  # Поиск по data_second_variant
-        print()
+        with open('data_second_variant.csv', 'r', encoding='utf-8') as file:
+            data_second = file.readlines()
+            result_list = []
+            for i in range(len(data_second)):
+                if i == '\n' or i == len(data_second) - 1:
+                    if i == 'n':
+                        i_list = data_second[i - 1].split(';')
+                    elif i == len(data_second) - 1:
+                        i_list = data_second[i].split(';')
+
+                    if data_for_search in i_list[len(i_list) - search_index]:
+                        result_list.append(data_second[i - 1])
+            print(result_list)
+
+
+search_data()
