@@ -1,13 +1,29 @@
-import csv
+def name_data():
+    name = input('Введите ваше имя: ')
+    return name
 
 
-data = [     
-	['name', 'age', 'city'],     
-	['Alice', 25, 'New York'],     
-	['Bob', 30, 'Los Angeles'],     
-	['Charlie', 35, 'Chicago'] 
-]
+def surname_data():
+    surname = input('Введите вашу фамилию: ')
+    return surname
 
-with open('output.csv', 'w', newline='') as file:     
-	writer = csv.writer(file)     
-	writer.writerows(data)
+
+def phone_data():
+    surname = input('Введите ваш телефон: ')
+    return surname
+
+
+def address_data():
+    address = input('Введите ваш адрес: ')
+    return address
+
+
+def input_data():
+    name = name_data()
+    surname = surname_data()
+    phone = phone_data()
+    address = address_data()
+    return [name, surname, phone, address]
+
+
+print(input_data())
