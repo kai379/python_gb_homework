@@ -119,7 +119,8 @@ def search_data():
 
     data_for_search = input(f'Введите {text_for_input} для поиска: ')
 
-    if file_var == '1':  # Поиск по data_first_variant
+    # Поиск по data_first_variant
+    if file_var == '1':
         with open('data_first_variant.csv', 'r', encoding='utf-8') as file:
             data_first = file.readlines()
             print(data_first)
@@ -131,20 +132,30 @@ def search_data():
                         search_results.append(''.join(data_first[j:i + 1]))
                     j = i + 1
             print(''.join(search_results))
-    elif file_var == '2':  # Поиск по data_second_variant
+    # Поиск по data_second_variant
+    elif file_var == '2':
         with open('data_second_variant.csv', 'r', encoding='utf-8') as file:
             data_second = file.readlines()
             result_list = []
+            # print('data_second: ', data_second)
+            # Проход по полученному списку из файла
             for i in range(len(data_second)):
-                if i == '\n' or i == len(data_second) - 1:
-                    if i == 'n':
+                if data_second[i] == '\n' or i == len(data_second) - 1:
+                    i_list = []
+                    # Поиск по всем элементам, кроме последнего
+                    if data_second[i] == '\n':
                         i_list = data_second[i - 1].split(';')
+                        # print('При /n: ', i_list)
+                        if data_for_search in i_list[len(i_list) - search_index]:
+                            result_list.append(data_second[i - 1])
+                    # Поиск по последнему элементу
                     elif i == len(data_second) - 1:
                         i_list = data_second[i].split(';')
-
-                    if data_for_search in i_list[len(i_list) - search_index]:
-                        result_list.append(data_second[i - 1])
-            print(result_list)
+                        # print('При -1: ', i_list)
+                        if data_for_search in i_list[len(i_list) - search_index]:
+                            result_list.append(data_second[i])
+            print('\n--- Результаты поиска: ---')
+            print('\n'.join(result_list))
 
 
 search_data()
