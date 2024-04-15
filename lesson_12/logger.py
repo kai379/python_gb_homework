@@ -56,6 +56,7 @@ def select_file_for_work(menu_text: str) -> str:
     return var
 
 
+# Вывод информации из файлов
 def print_data():
     var = select_file_for_work('Из какого файла вывести информацию?')
 
@@ -76,16 +77,12 @@ def print_data():
             print(*data_second)
 
 
-def delete_data():
-    print()
-
-
 def change_data():
     print()
 
 
 # Меню для режима поиска с возвратом [поправочного индекса (int), данных для поиска (str)]
-def search_menu() -> list[int, str]:
+def search_menu() -> list[int | str]:
     print(
         "По каким данным осуществлять поиск?\n"
         "1 - По имени\n"
@@ -121,23 +118,27 @@ def search_menu() -> list[int, str]:
 
 
 # Поиск по data_first. Возвращает список со строкой контакта
-def search_in_data_first(data_for_search: str, search_index: int) -> list:
+def search_in_data_first(data_for_search: str, search_index: int) -> list[list | int]:
     with open('data_first_variant.csv', 'r', encoding='utf-8') as file:
         data_first = file.readlines()
         search_result_list = []
         j = 0
+        contact_index = 0
         for i in range(len(data_first)):
-            if data_first[i] == '\n' or i == len(data_first) - 1:
+            if data_first[i] == '\n':  # or i == len(data_first) - 1:
                 if data_for_search in data_first[i - search_index]:
                     search_result_list.append(''.join(data_first[j:i + 1]))
+                    contact_index = i
                 j = i + 1
-    return search_result_list
+
+    return [search_result_list, contact_index]
 
 
-def search_in_data_second(data_for_search: str, search_index: int) -> list:
+def search_in_data_second(data_for_search: str, search_index: int) -> list[list | int]:
     with open('data_second_variant.csv', 'r', encoding='utf-8') as file:
         data_second = file.readlines()
         search_result_list = []
+        contact_index = 0
         # print('data_second: ', data_second)
         # Проход по полученному списку из файла
         for i in range(len(data_second)):
@@ -149,13 +150,14 @@ def search_in_data_second(data_for_search: str, search_index: int) -> list:
                     # print('При /n: ', i_list)
                     if data_for_search in i_list[len(i_list) - search_index]:
                         search_result_list.append(data_second[i - 1])
+                        contact_index = i - 1
                 # Поиск по последнему элементу
-                elif i == len(data_second) - 1:
-                    i_list = data_second[i].split(';')
-                    # print('При -1: ', i_list)
-                    if data_for_search in i_list[len(i_list) - search_index]:
-                        search_result_list.append(data_second[i])
-    return search_result_list
+                # elif i == len(data_second) - 1:
+                #     i_list = data_second[i].split(';')
+                #     # print('При -1: ', i_list)
+                #     if data_for_search in i_list[len(i_list) - search_index]:
+                #         search_result_list.append(data_second[i])
+    return [search_result_list, contact_index]
 
 
 # Поиск по двум файлам с выводом результата в терминал
@@ -168,8 +170,38 @@ def search_data():
 
     # Поиск по data_first_variant
     if file_var == '1':
-        print(''.join(search_in_data_first(data_for_search, search_index)))
+        search_in_data_first_list = search_in_data_first(data_for_search, search_index)
+        print(''.join(search_in_data_first_list[0]))
     # Поиск по data_second_variant
     elif file_var == '2':
+        search_in_data_second_return = search_in_data_second(data_for_search, search_index)
         print('\n--- Результаты поиска: ---'
-              '\n'.join(search_in_data_second(data_for_search, search_index)))
+              '\n'.join(search_in_data_second_return[0]))
+
+
+def delete_data():
+    var = select_file_for_work('В каком файле произвести удаление?')
+    search_menu_list = search_menu()
+    search_index, data_for_search = search_menu_list[0], search_menu_list[1]
+    if var == '1':
+        search_in_data_first_list = search_in_data_first(data_for_search, search_index)
+        search_result_list, contact_index = search_in_data_first_list[0], search_in_data_first_list[1]
+        # list_to_contact = []
+        # list_after_contact = []
+        result_list = []
+        with open('data_first_variant.csv', 'r', encoding='utf-8') as file:
+            data_first = file.readlines()
+            j = 0
+            for i in range(len(data_first)):
+                if i == contact_index:
+                    result_list.append(data_first[j:contact_index - search_index])
+                    result_list.append(data_first[i + 1:])
+        result_list = list(map(lambda x: ''.join(x), result_list))
+        with open('data_first_variant.csv', 'w', encoding='utf-8') as file:
+            file.writelines(''.join(result_list))
+
+    elif var == '2':
+        search_in_data_second_list = search_in_data_second(data_for_search, search_index)
+
+
+delete_data()
