@@ -84,9 +84,8 @@ def change_data():
     print()
 
 
-def search_data():
-    file_var = select_file_for_work('По какому файлу осуществить поиск?')
-
+# Меню для режима поиска с возвратом [поправочного индекса (int), данных для поиска (str)]
+def search_menu() -> list[int, str]:
     print(
         "По каким данным осуществлять поиск?\n"
         "1 - По имени\n"
@@ -118,44 +117,59 @@ def search_data():
             text_for_input = 'адрес'
 
     data_for_search = input(f'Введите {text_for_input} для поиска: ')
+    return [search_index, data_for_search]
+
+
+# Поиск по data_first. Возвращает список со строкой контакта
+def search_in_data_first(data_for_search: str, search_index: int) -> list:
+    with open('data_first_variant.csv', 'r', encoding='utf-8') as file:
+        data_first = file.readlines()
+        search_result_list = []
+        j = 0
+        for i in range(len(data_first)):
+            if data_first[i] == '\n' or i == len(data_first) - 1:
+                if data_for_search in data_first[i - search_index]:
+                    search_result_list.append(''.join(data_first[j:i + 1]))
+                j = i + 1
+    return search_result_list
+
+
+def search_in_data_second(data_for_search: str, search_index: int) -> list:
+    with open('data_second_variant.csv', 'r', encoding='utf-8') as file:
+        data_second = file.readlines()
+        search_result_list = []
+        # print('data_second: ', data_second)
+        # Проход по полученному списку из файла
+        for i in range(len(data_second)):
+            if data_second[i] == '\n' or i == len(data_second) - 1:
+                i_list = []
+                # Поиск по всем элементам, кроме последнего
+                if data_second[i] == '\n':
+                    i_list = data_second[i - 1].split(';')
+                    # print('При /n: ', i_list)
+                    if data_for_search in i_list[len(i_list) - search_index]:
+                        search_result_list.append(data_second[i - 1])
+                # Поиск по последнему элементу
+                elif i == len(data_second) - 1:
+                    i_list = data_second[i].split(';')
+                    # print('При -1: ', i_list)
+                    if data_for_search in i_list[len(i_list) - search_index]:
+                        search_result_list.append(data_second[i])
+    return search_result_list
+
+
+# Поиск по двум файлам с выводом результата в терминал
+def search_data():
+    # Выбор файла для работы
+    file_var = select_file_for_work('По какому файлу осуществить поиск?')
+    # Получение поправочного индекса и данных для поиска
+    search_menu_list = search_menu()
+    search_index, data_for_search = search_menu_list[0], search_menu_list[1]
 
     # Поиск по data_first_variant
     if file_var == '1':
-        with open('data_first_variant.csv', 'r', encoding='utf-8') as file:
-            data_first = file.readlines()
-            print(data_first)
-            search_results = []
-            j = 0
-            for i in range(len(data_first)):
-                if data_first[i] == '\n' or i == len(data_first) - 1:
-                    if data_for_search in data_first[i - search_index]:
-                        search_results.append(''.join(data_first[j:i + 1]))
-                    j = i + 1
-            print(''.join(search_results))
+        print(''.join(search_in_data_first(data_for_search, search_index)))
     # Поиск по data_second_variant
     elif file_var == '2':
-        with open('data_second_variant.csv', 'r', encoding='utf-8') as file:
-            data_second = file.readlines()
-            result_list = []
-            # print('data_second: ', data_second)
-            # Проход по полученному списку из файла
-            for i in range(len(data_second)):
-                if data_second[i] == '\n' or i == len(data_second) - 1:
-                    i_list = []
-                    # Поиск по всем элементам, кроме последнего
-                    if data_second[i] == '\n':
-                        i_list = data_second[i - 1].split(';')
-                        # print('При /n: ', i_list)
-                        if data_for_search in i_list[len(i_list) - search_index]:
-                            result_list.append(data_second[i - 1])
-                    # Поиск по последнему элементу
-                    elif i == len(data_second) - 1:
-                        i_list = data_second[i].split(';')
-                        # print('При -1: ', i_list)
-                        if data_for_search in i_list[len(i_list) - search_index]:
-                            result_list.append(data_second[i])
-            print('\n--- Результаты поиска: ---')
-            print('\n'.join(result_list))
-
-
-search_data()
+        print('\n--- Результаты поиска: ---'
+              '\n'.join(search_in_data_second(data_for_search, search_index)))
