@@ -8,18 +8,21 @@ def interface():
         pass
 
     command = '0'
-    while command != '4':
+    while command != '6':
         print(
             "Добрый день! Вы попали на специальный бот справочник. \n"
             "1 - Запись данных\n" 
             "2 - Вывод данных\n"
             "3 - Поиск контакта\n"
-            "4 - Выход из программы"
+            "4 - Удаление контакта\n"
+            "5 - Изменение контакта\n"
+            "6 - Выход из программы"
         )
 
-        command = input('Введите номер пункта меню:')
+        command = input('--------------------------\n'
+                        'Введите номер пункта меню:')
 
-        while command not in ('1', '2', '3', '4'):
+        while command not in ('1', '2', '3', '4', '5', '6'):
             print('Неправильный ввод!!!')
             command = input('Введите номер пункта меню:')
 
@@ -30,5 +33,9 @@ def interface():
         elif command == '3':
             search_data()
         elif command == '4':
+            delete_data()
+        elif command == '5':
+            change_data()
+        elif command == '6':
             print('До свидания')
 

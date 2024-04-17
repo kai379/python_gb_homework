@@ -42,7 +42,7 @@ def create_data():
         record_contact_in_second_f(contact)
 
 
-# Функция выбора файла для поиска/записи
+# Функция выбора файла для работы
 def select_file_for_work(menu_text: str) -> str:
     var = input(
         f'{menu_text}\n'
@@ -75,10 +75,6 @@ def print_data():
         with open('data_second_variant.csv', 'r', encoding='utf-8') as file:
             data_second = file.readlines()
             print(*data_second)
-
-
-def change_data():
-    print()
 
 
 # Меню для режима поиска с возвратом [поправочного индекса (int), данных для поиска (str)]
@@ -125,13 +121,28 @@ def search_in_data_first(data_for_search: str, search_index: int) -> list[list |
         j = 0
         contact_index = 0
         for i in range(len(data_first)):
-            if data_first[i] == '\n':  # or i == len(data_first) - 1:
+            if data_first[i] == '\n':
                 if data_for_search in data_first[i - search_index]:
                     search_result_list.append(''.join(data_first[j:i + 1]))
                     contact_index = i
                 j = i + 1
-
-    return [search_result_list, contact_index]
+    # Если ничего не найдено
+    if not search_result_list:
+        print('Контакт не найден.\n'
+              '1 - Искать ещё раз\n'
+              '2 - Выйти в главное меню')
+        var = input('Введите номер пункта меню:')
+        while var not in ('1', '2'):
+            print('Неправильный ввод!!!')
+            var = input('Введите номер пункта меню:')
+        if var == '1':
+            search_menu_list = search_menu()
+            search_index, data_for_search = search_menu_list[0], search_menu_list[1]
+            search_in_data_first(data_for_search, search_index)
+        elif var == '2':
+            print()
+    else:
+        return [search_result_list, contact_index]
 
 
 def search_in_data_second(data_for_search: str, search_index: int) -> list[list | int]:
@@ -139,25 +150,34 @@ def search_in_data_second(data_for_search: str, search_index: int) -> list[list 
         data_second = file.readlines()
         search_result_list = []
         contact_index = 0
-        # print('data_second: ', data_second)
         # Проход по полученному списку из файла
         for i in range(len(data_second)):
-            if data_second[i] == '\n' or i == len(data_second) - 1:
+            if data_second[i] == '\n':
                 i_list = []
                 # Поиск по всем элементам, кроме последнего
                 if data_second[i] == '\n':
                     i_list = data_second[i - 1].split(';')
-                    # print('При /n: ', i_list)
                     if data_for_search in i_list[len(i_list) - search_index]:
                         search_result_list.append(data_second[i - 1])
+                        search_result_list[0] += '\n'
                         contact_index = i - 1
-                # Поиск по последнему элементу
-                # elif i == len(data_second) - 1:
-                #     i_list = data_second[i].split(';')
-                #     # print('При -1: ', i_list)
-                #     if data_for_search in i_list[len(i_list) - search_index]:
-                #         search_result_list.append(data_second[i])
-    return [search_result_list, contact_index]
+    # Если ничего не найдено
+    if not search_result_list:
+        print('Контакт не найден.\n'
+              '1 - Искать ещё раз\n'
+              '2 - Выйти в главное меню')
+        var = input('Введите номер пункта меню:')
+        while var not in ('1', '2'):
+            print('Неправильный ввод!!!')
+            var = input('Введите номер пункта меню:')
+        if var == '1':
+            search_menu_list = search_menu()
+            search_index, data_for_search = search_menu_list[0], search_menu_list[1]
+            search_in_data_second(data_for_search, search_index)
+        elif var == '2':
+            print()
+    else:
+        return [search_result_list, contact_index]
 
 
 # Поиск по двум файлам с выводом результата в терминал
@@ -167,11 +187,11 @@ def search_data():
     # Получение поправочного индекса и данных для поиска
     search_menu_list = search_menu()
     search_index, data_for_search = search_menu_list[0], search_menu_list[1]
-
     # Поиск по data_first_variant
     if file_var == '1':
         search_in_data_first_list = search_in_data_first(data_for_search, search_index)
-        print(''.join(search_in_data_first_list[0]))
+        print('\n--- Результаты поиска: ---'
+              ''.join(search_in_data_first_list[0]))
     # Поиск по data_second_variant
     elif file_var == '2':
         search_in_data_second_return = search_in_data_second(data_for_search, search_index)
@@ -179,29 +199,153 @@ def search_data():
               '\n'.join(search_in_data_second_return[0]))
 
 
+# Получение двух списков, до необходимого контакта и после, c data_first
+def get_the_before_and_after_list_for_first(data_for_search: str, search_index: int):
+    search_in_data_first_list = search_in_data_first(data_for_search, search_index)
+    search_result_list, contact_index = search_in_data_first_list[0], search_in_data_first_list[1]
+    up_list = []
+    after_list = []
+    with open('data_first_variant.csv', 'r', encoding='utf-8') as file:
+        data_first = file.readlines()
+        for i in range(len(data_first)):
+            if i == contact_index:
+                up_list.append(data_first[0:contact_index - search_index])
+                after_list.append(data_first[i + 1:])
+    return [*up_list, *after_list]
+
+
+# Получение двух списков, до необходимого контакта и после, c data_second
+def get_the_before_and_after_list_for_second(data_for_search: str, search_index: int):
+    search_in_data_second_list = search_in_data_second(data_for_search, search_index)
+    search_result_list, contact_index = search_in_data_second_list[0], search_in_data_second_list[1]
+    up_list = []
+    after_list = []
+    with open('data_second_variant.csv', 'r', encoding='utf-8') as file:
+        data_second = file.readlines()
+        for i in range(len(data_second)):
+            if i == contact_index:
+                up_list.append(data_second[0:contact_index])
+                after_list.append(data_second[contact_index + 2:])
+    return [*up_list, *after_list]
+
+
+# Удаление контакта из файлов
 def delete_data():
     var = select_file_for_work('В каком файле произвести удаление?')
     search_menu_list = search_menu()
     search_index, data_for_search = search_menu_list[0], search_menu_list[1]
+    # Удаление по первому файлу
     if var == '1':
-        search_in_data_first_list = search_in_data_first(data_for_search, search_index)
-        search_result_list, contact_index = search_in_data_first_list[0], search_in_data_first_list[1]
-        # list_to_contact = []
-        # list_after_contact = []
-        result_list = []
-        with open('data_first_variant.csv', 'r', encoding='utf-8') as file:
-            data_first = file.readlines()
-            j = 0
-            for i in range(len(data_first)):
-                if i == contact_index:
-                    result_list.append(data_first[j:contact_index - search_index])
-                    result_list.append(data_first[i + 1:])
+        result_list = get_the_before_and_after_list_for_first(data_for_search, search_index)
         result_list = list(map(lambda x: ''.join(x), result_list))
         with open('data_first_variant.csv', 'w', encoding='utf-8') as file:
             file.writelines(''.join(result_list))
-
+    # Удаление по второму файлу
     elif var == '2':
+        result_list = get_the_before_and_after_list_for_second(data_for_search, search_index)
+        result_list = list(map(lambda x: ''.join(x), result_list))
+        with open('data_second_variant.csv', 'w', encoding='utf-8') as file:
+            file.writelines(''.join(result_list))
+
+
+# Изменение данных
+def change_data():
+    var = select_file_for_work('В каком файле произвести изменение контакта?')
+    search_menu_list = search_menu()
+    search_index, data_for_search = search_menu_list[0], search_menu_list[1]
+    # Изменение контакта в первом файле
+    if var == '1':
+        search_in_data_first_list = search_in_data_first(data_for_search, search_index)
+        contact_data = search_in_data_first_list[0]
+        print(
+            "Что необходимо изменить в контакте?\n"
+            "1 - Имя\n"
+            "2 - Фамилию\n"
+            "3 - Номер телефона\n"
+            "4 - Адрес"
+        )
+
+        search_var = input('Введите номер пункта меню:')
+        while search_var not in ('1', '2', '3', '4'):
+            print('Неправильный ввод!!!')
+            search_var = input('Введите номер пункта меню:')
+
+        # Число поправки индекса при поиске по:
+        search_index_contact = 0
+        text_for_input = ''
+        match search_var:
+            case '1':
+                search_index_contact = 0  # Имени
+                text_for_input = 'Имя'
+            case '2':
+                search_index_contact = 1  # Фамилии
+                text_for_input = 'Фамилию'
+            case '3':
+                search_index_contact = 2  # Номеру телефона
+                text_for_input = 'номер телефона'
+            case '4':
+                search_index_contact = 3  # Адресу
+                text_for_input = 'адрес'
+
+        data_for_change = input(f'Введите {text_for_input} для изменения контакта: ')
+        # Изменение выбранного контакта
+        contact_for_change = contact_data[0].split('\n')
+        contact_for_change[search_index_contact] = data_for_change
+        contact_for_change = list(''.join('\n'.join(contact_for_change)))
+        # Слияние списков до контакта + контакт + после контакта
+        up_and_after_list = get_the_before_and_after_list_for_first(data_for_search, search_index)
+        up_list, after_list = up_and_after_list[0], up_and_after_list[1]
+        result_list = [up_list, contact_for_change, after_list]
+        result_list = list(map(lambda x: ''.join(x), result_list))
+        # Запись в файл результата
+        with open('data_first_variant.csv', 'w', encoding='utf-8') as file:
+            file.writelines(''.join(result_list))
+    # Изменение контакта во втором файле
+    elif var == '2':
+        # Поиск контакта
         search_in_data_second_list = search_in_data_second(data_for_search, search_index)
+        contact_data = search_in_data_second_list[0]
 
+        print(
+            "Что необходимо изменить в контакте?\n"
+            "1 - Имя\n"
+            "2 - Фамилию\n"
+            "3 - Номер телефона\n"
+            "4 - Адрес"
+        )
 
-delete_data()
+        search_var = input('Введите номер пункта меню:')
+        while search_var not in ('1', '2', '3', '4'):
+            print('Неправильный ввод!!!')
+            search_var = input('Введите номер пункта меню:')
+
+        # Число поправки индекса при поиске по:
+        search_index_contact = 0
+        text_for_input = ''
+        match search_var:
+            case '1':
+                search_index_contact = 0  # Имени
+                text_for_input = 'Имя'
+            case '2':
+                search_index_contact = 1  # Фамилии
+                text_for_input = 'Фамилию'
+            case '3':
+                search_index_contact = 2  # Номеру телефона
+                text_for_input = 'номер телефона'
+            case '4':
+                search_index_contact = 3  # Адресу
+                text_for_input = 'адрес'
+
+        data_for_change = input(f'Введите {text_for_input} для изменения контакта: ')
+        # Изменение выбранного контакта
+        contact_for_change = contact_data[0].split(';')
+        contact_for_change[search_index_contact] = data_for_change
+        contact_for_change = list(''.join(';'.join(contact_for_change)))
+        # Слияние списков до контакта + контакт + после контакта
+        up_and_after_list = get_the_before_and_after_list_for_second(data_for_search, search_index)
+        up_list, after_list = up_and_after_list[0], up_and_after_list[1]
+        result_list = [up_list, contact_for_change, after_list]
+        result_list = list(map(lambda x: ''.join(x), result_list))
+        # Запись в файл результата
+        with open('data_second_variant.csv', 'w', encoding='utf-8') as file:
+            file.writelines(''.join(result_list))
